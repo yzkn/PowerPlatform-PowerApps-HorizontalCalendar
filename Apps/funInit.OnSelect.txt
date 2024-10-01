@@ -1,0 +1,43 @@
+// 祝日マスタはApp.OnStartで定義する。
+// （Excelから貼り付け。TSV形式の文字列として保持する。）
+
+ClearCollect(
+    colMonths,
+    AddColumns(
+        AddColumns(
+            AddColumns(
+                Sequence((EndYear - StartYear + 1) * 12),
+                FirstDay,
+                DateAdd(
+                    Date(StartYear, 1 , 1), 
+                    Value - 1, 
+                    TimeUnit.Months
+                )
+            ),
+            Offset,
+            Weekday(FirstDay) - 1
+        ),
+        Days,
+        AddColumns(
+            Sequence(
+                DateDiff(FirstDay, DateAdd(DateAdd(FirstDay, 1, TimeUnit.Months), -1, TimeUnit.Days)) + Offset + 1,
+                -1 * Offset
+            ),
+            TargetDate,
+            DateAdd(FirstDay, Value, TimeUnit.Days)
+        ),
+        DaysString,
+        Concat(
+        AddColumns(
+            Sequence(
+                DateDiff(FirstDay, DateAdd(DateAdd(FirstDay, 1, TimeUnit.Months), -1, TimeUnit.Days)) + Offset + 1,
+                -1 * Offset
+            ),
+            TargetDate,
+            DateAdd(FirstDay, Value, TimeUnit.Days)
+        )
+        ,Value & " " & TargetDate & ", ")
+    )
+);
+
+Select(galMonths, 13)
